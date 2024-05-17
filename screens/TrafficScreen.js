@@ -1,22 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const TrafficScreen = ({ navigation }) => {
-  // Simulated traffic data
-  const trafficData = [
-    { id: 1, route: 'Kingsway Road', congestionLevel: 'Low' },
-    { id: 2, route: 'Main North 1', congestionLevel: 'Medium' },
-    { id: 3, route: 'Pioneer Road', congestionLevel: 'High' },
-  ];
+  // State to store traffic data
+  const [trafficData, setTrafficData] = useState([]);
+
+  // Function to fetch traffic data from the server
+  const fetchTrafficData = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/trafficData');
+      if (!response.ok) {
+        throw new Error('Failed to fetch traffic data');
+      }
+      const data = await response.json();
+      setTrafficData(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Fetch traffic data when the component mounts
+  useEffect(() => {
+    fetchTrafficData();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Traffic Routes</Text>
       {trafficData.map(route => (
         <TouchableOpacity
-          key={route.id}
+          key={route.traffic_id}
           style={styles.routeItem}
-          onPress={() => navigation.navigate('TrafficRouteDetailsScreen', { routeId: route.id })}
+          onPress={() => navigation.navigate('TrafficRouteDetailsScreen', { routeId: route.traffic_id })}
         >
           <Text style={styles.routeName}>{route.route}</Text>
           <Text style={styles.congestionLevel}>Congestion Level: {route.congestionLevel}</Text>

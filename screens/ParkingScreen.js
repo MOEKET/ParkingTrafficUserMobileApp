@@ -1,21 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const ParkingScreen = ({ navigation }) => {
-  // Simulated parking data
-  const parkingData = [
-    { id: 1, location: 'Maseru Mall Parking Lot', availableSpaces: 50 },
-    { id: 2, location: 'Pioneer Mall Parking Lot', availableSpaces: 20 },
-    { id: 3, location: 'LNDC Maseru Parking Lot', availableSpaces: 10 },
-  ];
+  // State to store parking data
+  const [parkingData, setParkingData] = useState([]);
+
+  // Function to fetch parking data from the server
+  const fetchParkingData = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/parkingData');
+      if (!response.ok) {
+        throw new Error('Failed to fetch parking data');
+      }
+      const data = await response.json();
+      setParkingData(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Fetch parking data when the component mounts
+  useEffect(() => {
+    fetchParkingData();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Parking Availability</Text>
       {parkingData.map(parking => (
-        <TouchableOpacity key={parking.id} style={styles.parkingItem}>
+        <TouchableOpacity key={parking.parking_id} style={styles.parkingItem}>
           <Text style={styles.parkingLocation}>{parking.location}</Text>
-          <Text style={styles.availableSpaces}>Available Spaces: {parking.availableSpaces}</Text>
+          <Text style={styles.availableSpaces}>Available Spaces: {parking.available_spots}</Text>
         </TouchableOpacity>
       ))}
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('SearchParking')}>
@@ -70,3 +85,6 @@ const styles = StyleSheet.create({
 });
 
 export default ParkingScreen;
+
+
+
